@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 #include<algorithm>
 #include<vector>
 #include<string>
@@ -50,6 +51,44 @@ class Student{
 
 
 };
+
+
+void saveToFile(vector<Student>& students) {
+    ofstream file("students.txt");
+    if (!file.is_open()) {
+        cout << "Error: file is not opening" << endl;
+        return;
+    }
+    for (int i = 0; i < students.size(); i++) {
+        file << students[i].id    << "\n";
+        file << students[i].name  << "\n";
+        file << students[i].age   << "\n";
+        file << students[i].marks << "\n";
+    }
+    file.close();
+    cout << "Data is saved now in (students.txt)" << endl;
+}
+
+void loadFromFile(vector<Student>& students) {
+    ifstream file("students.txt");
+    if (!file.is_open()) {
+        cout << "Koi purana data nahi mila, fresh start!" << endl;
+        return;
+    }
+    int id, age;
+    float marks;
+    string name;
+    while (file >> id) {
+        file.ignore();
+        getline(file, name);
+        file >> age >> marks;
+        file.ignore();
+        students.push_back(Student(id, name, age, marks));
+    }
+    file.close();
+    cout << students.size() << " students load ho gaye!" << endl;
+}
+
 
 
 void addStudent(vector<Student> &students){
@@ -108,7 +147,7 @@ void remove(vector<Student> &students){
     for(int i=0;i<students.size();i++){
 
         if(students[i].id == id){
-            students.erase(students.begin()+1);
+            students.erase(students.begin()+i);
             cout<<"Deleted"<<endl;
             return;
 
@@ -140,7 +179,7 @@ void update(vector<Student> &students){
             cin.ignore();
 
             cout<<"Enter new name"<<endl;
-            cin >> students[i].name;
+            getline(cin,students[i].name);
             cin.ignore();
 
 
@@ -152,9 +191,13 @@ void update(vector<Student> &students){
            cin>>students[i].marks;
             cin.ignore();
 
-            students[i].calculateGrade();
 
+            students[i].calculateGrade();
+            saveToFile(students);  
             cout << "Updated!\n";
+
+
+
             return;
 
 
@@ -167,6 +210,7 @@ void update(vector<Student> &students){
 
 int main(){
     vector<Student> students; 
+     loadFromFile(students);
     int choice;
   
 
@@ -196,10 +240,4 @@ int main(){
 
     }
     while(choice != 5);
-
-
-
-
-
-
 }
